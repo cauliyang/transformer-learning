@@ -9,9 +9,9 @@ from torch.optim.lr_scheduler import LambdaLR
 import pandas as pd
 import altair as alt
 
-# from torchtext.data.functional import to_map_style_dataset
-# from torchtext.vocab import build_vocab_from_iterator
-# import torchtext.datasets as datasets
+from torchtext.data.functional import to_map_style_dataset
+from torchtext.vocab import build_vocab_from_iterator
+import torchtext.datasets as datasets
 
 from torch.utils.data import DataLoader
 import spacy
@@ -55,16 +55,6 @@ def clones(module, N):
 # WARN: 1. What is the layerNorm <08-23-23>
 
 
-class SublayerConnection(nn.Module):
-    def __init__(self, size, dropout):
-        super().__init__()
-        self.norm = LayerNorm(size)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, x, sublayer):
-        return x + self.dropout(sublayer(self.norm(x)))
-
-
 class LayerNorm(nn.Module):
     def __init__(self, features, epes=1e-6) -> None:
         super().__init__()
@@ -78,16 +68,14 @@ class LayerNorm(nn.Module):
         return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
 
 
-class Encoder(nn.Module):
-    def __init__(self, layer, N) -> None:
+class SublayerConnection(nn.Module):
+    def __init__(self, size, dropout):
         super().__init__()
-        self.layers = clones(layer, N)
-        self.norm = LayerNorm(layer.size)
+        self.norm = LayerNorm(size)
+        self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x, mask):
-        for layer in self.layers:
-            x = layer(x, mask)
-        return self.norm(x)
+    def forward(self, x, sublayer):
+        return x + self.dropout(sublayer(self.norm(x)))
 
 
 class EncoderLayer(nn.Module):
@@ -100,6 +88,18 @@ class EncoderLayer(nn.Module):
     def forward(self, x, mask):
         x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, mask))
         return self.sublayer[1](x, self.fed_forward)
+
+
+class Encoder(nn.Module):
+    def __init__(self, layer, N) -> None:
+        super().__init__()
+        self.layers = clones(layer, N)
+        self.norm = LayerNorm(layer.size)
+
+    def forward(self, x, mask):
+        for layer in self.layers:
+            x = layer(x, mask)
+        return self.norm(x)
 
 
 class Decoder(nn.Module):
@@ -179,9 +179,52 @@ class MultiHeadedAttention(nn.Module):
         ]
 
         x, self.attn = attention(query, key, value, mask=mask, dropout=self.dropout)
-
         x = x.transpose(1, 2).contiguous().view(nbatches, -1, self.h * self.d_k)
 
         del query, key, value
 
         return self.linears[-1](x)
+
+
+class PositionwiseFeedForward(nn.Module):
+    def __init__(self, d_model, d_ff, dropout=0.1):
+        super().__init__()
+        self.w_1 = nn.Linear(d_model, d_ff)
+        self.w_2 = nn.Linear(d_ff, d_model)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        return self.w_2(self.dropout(self.w_1(x).relu()))
+
+
+class Embeddings(nn.Module):
+    def __init__(self, d_model, vocab):
+        super().__init__()
+        self.lut = nn.Embedding(vocab, d_model)
+        self.d_model = d_model
+
+    def forward(self, x):
+        return self.lut(x) * math.sqrt(self.d_model)
+
+
+class PositinalEncoding(nn.Module):
+    def __init__(self, d_model, dropout, max_len=5000):
+        super().__init__()
+        self.dropout = nn.Dropout(dropout)
+
+        pe = torch.zeros(max_len, d_model)
+
+        position = torch.arange(0, max_len).unsqueeze(1)
+
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2) * -(math.log(10000.0) / d_model)
+        )
+
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0)
+        self.register_buffer("pe", pe)
+
+    def forward(self, x):
+        x += self.pe[:, : x.size(1)].requires_grad_(False)
+        return self.dropout(x)
