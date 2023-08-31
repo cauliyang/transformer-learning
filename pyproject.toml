@@ -11,6 +11,9 @@ python = "^3.10"
 [tool.poetry.scripts]
 "texample" = "transformer.example:main"
 
+[tool.ruff]
+line-length = 120
+
 
 [build-system]
 requires = ["poetry-core"]
