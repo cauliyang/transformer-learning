@@ -11,13 +11,81 @@ rich = "^13.5.2"
 
 
 [tool.poetry.scripts]
-"examples" = "transformer-learning.example:main"
+"examples" = "transformer_learning.example:main"
 
 [tool.poetry.group.dev.dependencies]
 ipdb = "^0.13.13"
 
+
 [tool.ruff]
-line-length = 120
+select = [
+    # "ANN",
+    # "D",
+    "A",
+    "F",
+    "E",
+    "W",
+    "C90",
+    "I",
+    "UP",
+    "N",
+    "YTT",
+    "TID",
+    "S",
+    "BLE",
+    "FBT",
+    "PLR",
+    "B",
+    "B9",
+    "A",
+    "C4",
+    "T10",
+    "EM",
+    "ICN",
+    "T20",
+    "Q",
+    "RET",
+    "SIM",
+    "ARG",
+    "DTZ",
+    "ERA",
+    "PD",
+    "PGH",
+    "PLC",
+    "PLE",
+    "PLW",
+    "RUF",
+    "PL",
+    "TD",
+    "FIX",
+    "PTH",
+    "TCH",
+    "SLOT",
+    "PT",
+    "PYI",
+    "PIE",
+    "ISC",
+    "FA",
+    "EXE",
+    "CPY",
+    "COM",
+]
+line-length = 130
+exclude = ["tests", "cppext", "blat.py"]
+ignore = [
+    "ANN001",
+    "D203",
+    "D213",
+    "PGH003",
+    "PLR0911", # Too many return statements
+    "PLR0913", # Too many arguments to function call
+    "PLR0912", # Too many branches
+    "PLR0915", # Too many statements
+    "DTZ005",  # Without `tz` argument
+    "C901",    # Too complex
+
+]
+target-version = "py310"
 
 
 [build-system]
