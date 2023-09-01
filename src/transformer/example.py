@@ -7,13 +7,19 @@ import altair as alt
 import warnings
 
 from pathlib import Path
+from rich.console import Console
+from rich import print
 
-from .transformer import subsequent_mask, PositinalEncoding
+from .transformer import subsequent_mask, PositinalEncoding, make_model
+
+console = Console()
+
 
 # Set to False to skip notebook execution (e.g. for debugging)
 warnings.filterwarnings("ignore")
 RUN_EXAMPLES = True
 FIGURE_PATH = Path("figures/")
+EXAMPLES = []
 
 
 def is_interactive_notebook():
@@ -49,14 +55,26 @@ class DummyScheduler:
 def save_char(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        if RUN_EXAMPLES:
-            char = func(*args, **kwargs)
-            char.save(FIGURE_PATH / f"{func.__name__}.html")
-            return char
+        char = func(*args, **kwargs)
+        char.save(FIGURE_PATH / f"{func.__name__}.html")
+        return char
 
     return wrapper
 
 
+def example(func):
+    EXAMPLES.append(func.__name__)
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if RUN_EXAMPLES:
+            console.print(f"Running Example: {func.__name__}", style="bold red")
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
+@example
 @save_char
 def example_mask():
     LS_data = pd.concat(
@@ -88,6 +106,7 @@ def example_mask():
     return char
 
 
+@example
 @save_char
 def example_positional():
     pe = PositinalEncoding(20, 0)
@@ -117,5 +136,36 @@ def example_positional():
     return char
 
 
+def inference_test():
+    test_model = make_model(11, 11, 2)
+    test_model.eval()
+
+    src = torch.LongTensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+    src_mask = torch.ones(1, 1, 10)
+
+    memory = test_model.encode(src, src_mask)
+    ys = torch.zeros(1, 1).type(torch.long)
+
+    for i in range(9):
+        out = test_model.decode(memory, src_mask, ys, subsequent_mask(ys.size(1)))
+        prob = test_model.generator(out[:, -1])
+
+        _, next_word = torch.max(prob, dim=1)
+        next_word = next_word.data[0]
+
+        ys = torch.cat(
+            [ys, torch.zeros(1, 1).type_as(src.data).fill_(next_word)], dim=1
+        )
+
+    print(f"Example Untrained Model Predition: {ys}")
+
+
+@example
+def run_test():
+    for _ in range(10):
+        inference_test()
+
+
 def main():
-    example_positional()
+    console.print(f"Examples: {EXAMPLES}\n")
+    run_test()

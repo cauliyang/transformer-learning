@@ -4,6 +4,8 @@ from torch.nn.functional import log_softmax
 import math
 import copy
 
+# WARN: 1. What is the layerNorm <08-23-23>
+
 
 class EncoderDecoder(nn.Module):
     """
@@ -30,19 +32,27 @@ class EncoderDecoder(nn.Module):
         return self.decoder(self.tgt_embed(tgt), memory, src_mask, tgt_mask)
 
 
+class Generator(nn.Module):
+    "Define standard linear + softmax generation step."
+
+    def __init__(self, d_model, vocab):
+        super().__init__()
+        self.proj = nn.Linear(d_model, vocab)
+
+    def forward(self, x):
+        return log_softmax(self.proj(x), dim=-1)
+
+
 def clones(module, N):
     return nn.ModuleList([copy.deepcopy(module) for _ in range(N)])
 
 
-# WARN: 1. What is the layerNorm <08-23-23>
-
-
 class LayerNorm(nn.Module):
-    def __init__(self, features, epes=1e-6) -> None:
+    def __init__(self, features, eps=1e-6) -> None:
         super().__init__()
         self.a_2 = nn.Parameter(torch.ones(features))
         self.b_2 = nn.Parameter(torch.zeros(features))
-        self.epes = epes
+        self.eps = eps
 
     def forward(self, x):
         mean = x.mean(-2, keepdim=True)
@@ -66,6 +76,7 @@ class EncoderLayer(nn.Module):
         self.self_attn = self_attn
         self.fed_forward = feed_forward
         self.sublayer = clones(SublayerConnection(size, dropout), 2)
+        self.size = size
 
     def forward(self, x, mask):
         x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, mask))
@@ -195,18 +206,39 @@ class PositinalEncoding(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
         pe = torch.zeros(max_len, d_model)
-
         position = torch.arange(0, max_len).unsqueeze(1)
-
         div_term = torch.exp(
             torch.arange(0, d_model, 2) * -(math.log(10000.0) / d_model)
         )
 
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
+
         pe = pe.unsqueeze(0)
         self.register_buffer("pe", pe)
 
     def forward(self, x):
         x += self.pe[:, : x.size(1)].requires_grad_(False)
         return self.dropout(x)
+
+
+def make_model(src_vocab, tgt_vocab, N=6, d_model=512, h=8, dropout=0.1):
+    c = copy.deepcopy
+
+    attn = MultiHeadedAttention(h, d_model)
+    ff = PositionwiseFeedForward(d_model, d_model * 4, dropout)
+    position = PositinalEncoding(d_model, dropout)
+
+    model = EncoderDecoder(
+        Encoder(EncoderLayer(d_model, c(attn), c(ff), dropout), N),
+        Decoder(DecoderLayer(d_model, c(attn), c(attn), c(ff), dropout), N),
+        nn.Sequential(Embeddings(d_model, src_vocab), c(position)),
+        nn.Sequential(Embeddings(d_model, tgt_vocab), c(position)),
+        Generator(d_model, tgt_vocab),
+    )
+
+    for p in model.parameters():
+        if p.dim() > 1:
+            nn.init.xavier_uniform_(p)
+
+    return model
