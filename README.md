@@ -2,7 +2,7 @@
 
 This repository serves as a curated codebase to accompany my exploration of the exceptional blog: http://nlp.seas.harvard.edu/annotated-transformer/.
 The intent is to restructure the code for seamless interaction in a command-line environment, while judiciously maintaining minimal dependencies to enrich the learning experience.
-To this end, console output will still utilize the `print` function, albeit enhanced via the 'rich' library, as opposed to employing specialized logging libraries.
+To this end, console output will still utilize the `print` function, albeit enhanced via the `rich` library, as opposed to employing specialized logging libraries.
 
 ## How to
 

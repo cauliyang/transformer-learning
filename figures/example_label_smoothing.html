@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      #vis.vega-embed {
+        width: 100%;
+        display: flex;
+      }
+
+      #vis.vega-embed details,
+      #vis.vega-embed details summary {
+        position: relative;
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/vega@5"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/vega-lite@5.14.1"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/vega-embed@6"
+    ></script>
+  </head>
+  <body>
+    <div id="vis"></div>
+    <script>
+      (function (vegaEmbed) {
+        var spec = {
+          config: { view: { continuousWidth: 300, continuousHeight: 300 } },
+          data: { name: "data-657da60f13fd21ce0024d47b52e08641" },
+          mark: { type: "rect", color: "Blue", opacity: 1 },
+          encoding: {
+            color: {
+              field: "target distribution",
+              scale: { scheme: "viridis" },
+              type: "quantitative",
+            },
+            x: { field: "columns", title: null, type: "ordinal" },
+            y: { field: "rows", title: null, type: "ordinal" },
+          },
+          height: 250,
+          params: [
+            {
+              name: "param_1",
+              select: { type: "interval", encodings: ["x", "y"] },
+              bind: "scales",
+            },
+          ],
+          width: 250,
+          $schema: "https://vega.github.io/schema/vega-lite/v5.14.1.json",
+          datasets: {
+            "data-657da60f13fd21ce0024d47b52e08641": [
+              { "target distribution": 0.0, columns: 0, rows: 0 },
+              { "target distribution": 0.0, columns: 0, rows: 1 },
+              { "target distribution": 0.0, columns: 0, rows: 2 },
+              { "target distribution": 0.0, columns: 0, rows: 3 },
+              { "target distribution": 0.0, columns: 0, rows: 4 },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 1,
+                rows: 0,
+              },
+              {
+                "target distribution": 0.6000000238418579,
+                columns: 1,
+                rows: 1,
+              },
+              { "target distribution": 0.0, columns: 1, rows: 2 },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 1,
+                rows: 3,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 1,
+                rows: 4,
+              },
+              {
+                "target distribution": 0.6000000238418579,
+                columns: 2,
+                rows: 0,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 2,
+                rows: 1,
+              },
+              { "target distribution": 0.0, columns: 2, rows: 2 },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 2,
+                rows: 3,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 2,
+                rows: 4,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 3,
+                rows: 0,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 3,
+                rows: 1,
+              },
+              { "target distribution": 0.0, columns: 3, rows: 2 },
+              {
+                "target distribution": 0.6000000238418579,
+                columns: 3,
+                rows: 3,
+              },
+              {
+                "target distribution": 0.6000000238418579,
+                columns: 3,
+                rows: 4,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 4,
+                rows: 0,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 4,
+                rows: 1,
+              },
+              { "target distribution": 0.0, columns: 4, rows: 2 },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 4,
+                rows: 3,
+              },
+              {
+                "target distribution": 0.13333334028720856,
+                columns: 4,
+                rows: 4,
+              },
+            ],
+          },
+        };
+        var embedOpt = { mode: "vega-lite" };
+
+        function showError(el, error) {
+          el.innerHTML =
+            '<div style="color:red;">' +
+            "<p>JavaScript Error: " +
+            error.message +
+            "</p>" +
+            "<p>This usually means there's a typo in your chart specification. " +
+            "See the javascript console for the full traceback.</p>" +
+            "</div>";
+          throw error;
+        }
+        const el = document.getElementById("vis");
+        vegaEmbed("#vis", spec, embedOpt).catch((error) =>
+          showError(el, error),
+        );
+      })(vegaEmbed);
+    </script>
+  </body>
+</html>

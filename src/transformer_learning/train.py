@@ -1,8 +1,10 @@
 import time
 from dataclasses import dataclass
 
+import torch
 from rich import print
 from rich.console import Console
+from torch import nn
 
 from .transformer import subsequent_mask
 
@@ -101,3 +103,34 @@ def rate(step, model_size, factor, warmup):
     return factor * (
         model_size ** (-0.5) * min(step ** (-0.5), step * warmup ** (-1.5))
     )
+
+
+class LabelSmoothing(nn.Module):
+    def __init__(self, size, padding_idx, smotthing=0.0):
+        super().__init__()
+        self.criteria = nn.KLDivLoss(reduction="sum")
+        self.padding_idx = padding_idx
+        self.confidence = 1.0 - smotthing
+        self.smothing = smotthing
+        self.size = size
+        self.true_dist = None
+
+    def forward(self, x, target):
+        assert x.size(1) == self.size  # noqa: S101
+
+        true_dist = x.data.clone()
+
+        true_dist.fill_(self.smothing / (self.size - 2))
+
+        true_dist.scatter_(1, target.data.unsqueeze(1), self.confidence)
+
+        true_dist[:, self.padding_idx] = 0
+
+        mask = torch.nonzero(target.data == self.padding_idx)
+
+        if mask.dim() > 0:
+            true_dist.index_fill_(0, mask.squeeze(), 0.0)
+
+        self.true_dist = true_dist
+
+        return self.criteria(x, true_dist.clone().detach())
