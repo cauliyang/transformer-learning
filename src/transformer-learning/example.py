@@ -138,6 +138,7 @@ def example_positional():
 
 def inference_test():
     test_model = make_model(11, 11, 2)
+
     test_model.eval()
 
     src = torch.LongTensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
@@ -146,7 +147,7 @@ def inference_test():
     memory = test_model.encode(src, src_mask)
     ys = torch.zeros(1, 1).type(torch.long)
 
-    for i in range(9):
+    for _ in range(9):
         out = test_model.decode(memory, src_mask, ys, subsequent_mask(ys.size(1)))
         prob = test_model.generator(out[:, -1])
 

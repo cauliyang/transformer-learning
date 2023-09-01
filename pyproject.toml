@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "transformer"
+name = "transformer-learning"
 version = "0.1.0"
 description = ""
 authors = ["Yangyang Li <yangyang.li@northwestern.edu>"]
@@ -9,8 +9,12 @@ readme = "README.md"
 python = "^3.10"
 rich = "^13.5.2"
 
+
 [tool.poetry.scripts]
-"examples" = "transformer.example:main"
+"examples" = "transformer-learning.example:main"
+
+[tool.poetry.group.dev.dependencies]
+ipdb = "^0.13.13"
 
 [tool.ruff]
 line-length = 120
