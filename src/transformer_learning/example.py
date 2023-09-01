@@ -1,7 +1,7 @@
 import functools
+import subprocess
 import warnings
 from pathlib import Path
-from subprocess import call
 
 import altair as alt
 import pandas as pd
@@ -62,7 +62,7 @@ def save_char(func):
     def wrapper(*args, **kwargs):
         char = func(*args, **kwargs)
         char.save(FIGURE_PATH / f"{func.__name__}.html")
-        call(["open", str(FIGURE_PATH / f"{func.__name__}.html")])
+        subprocess.check_call(["open", str(FIGURE_PATH / f"{func.__name__}.html")])
         return char
 
     return wrapper
@@ -84,7 +84,7 @@ def example(func):
 @example
 @save_char
 def example_mask():
-    LS_data = pd.concat(
+    ls_data = pd.concat(
         [
             pd.DataFrame(
                 {
@@ -99,7 +99,7 @@ def example_mask():
     )
 
     return (
-        alt.Chart(LS_data)
+        alt.Chart(ls_data)
         .mark_rect()
         .properties(height=250, width=250)
         .encode(
@@ -184,7 +184,7 @@ def example_learning_schedule():
     learning_rates = []
 
     # we have 3 examples in opts list.
-    for _idx, example in enumerate(opts):
+    for _, example in enumerate(opts):
         # run 20000 epoch for each example
         optimizer = torch.optim.Adam(
             dummy_model.parameters(),
@@ -198,7 +198,7 @@ def example_learning_schedule():
         )
         tmp = []
         # take 20K dummy training steps, save the learning rate at each step
-        for _step in range(20000):
+        for _ in range(20000):
             tmp.append(optimizer.param_groups[0]["lr"])
             optimizer.step()
             lr_scheduler.step()

@@ -153,7 +153,7 @@ def attention(query, key, value, mask=None, dropout=None):
 class MultiHeadedAttention(nn.Module):
     def __init__(self, h, d_model, dropout=0.1):
         super().__init__()
-        assert d_model % h == 0
+        assert d_model % h == 0  # noqa: S101
 
         self.d_k = d_model // h
         self.h = h
@@ -169,7 +169,7 @@ class MultiHeadedAttention(nn.Module):
 
         query, key, value = (
             lin(x).view(nbatches, -1, self.h, self.d_k).transpose(1, 2)
-            for lin, x in zip(self.linears, (query, key, value))
+            for lin, x in zip(self.linears, (query, key, value), strict=True)
         )
 
         x, self.attn = attention(query, key, value, mask=mask, dropout=self.dropout)
@@ -219,7 +219,7 @@ class PositinalEncoding(nn.Module):
         self.register_buffer("pe", pe)
 
     def forward(self, x):
-        x += self.pe[:, : x.size(1)].requires_grad_(False)
+        x += self.pe[:, : x.size(1)].requires_grad_(False)  # noqa: FBT003
         return self.dropout(x)
 
 

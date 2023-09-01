@@ -19,8 +19,6 @@ ipdb = "^0.13.13"
 
 [tool.ruff]
 select = [
-    # "ANN",
-    # "D",
     "A",
     "F",
     "E",
@@ -83,9 +81,16 @@ ignore = [
     "PLR0915", # Too many statements
     "DTZ005",  # Without `tz` argument
     "C901",    # Too complex
+    "S603",
+    "S607",
+    "B023",
+    "B008",
 
 ]
 target-version = "py310"
+
+[tool.ruff.per-file-ignores]
+"src/transformer_learning/transformer.py" = ["N803"]
 
 
 [build-system]

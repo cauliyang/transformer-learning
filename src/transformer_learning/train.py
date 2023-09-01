@@ -77,7 +77,10 @@ def run_epoch(
             elapsed = time.time() - start
 
             print(
-                f"Epoch Step: {i:6} | Accum: {n_accum:3} | LR: {lr:6.2f} | Tokens / Sec {tokens/elapsed:7.1f} | Learning Rate: {lr:6.1f}",
+                (
+                    f"Epoch Step: {i:6} | Accum: {n_accum:3} | LR: {lr:6.2f} |"
+                    f"Tokens / Sec {tokens/elapsed:7.1f} | Learning Rate: {lr:6.1f}",
+                ),
             )
 
             start = time.time()
