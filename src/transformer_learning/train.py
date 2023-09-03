@@ -119,18 +119,13 @@ class LabelSmoothing(nn.Module):
         assert x.size(1) == self.size  # noqa: S101
 
         true_dist = x.data.clone()
-
         true_dist.fill_(self.smothing / (self.size - 2))
-
         true_dist.scatter_(1, target.data.unsqueeze(1), self.confidence)
-
         true_dist[:, self.padding_idx] = 0
-
         mask = torch.nonzero(target.data == self.padding_idx)
 
         if mask.dim() > 0:
             true_dist.index_fill_(0, mask.squeeze(), 0.0)
 
         self.true_dist = true_dist
-
         return self.criteria(x, true_dist.clone().detach())
