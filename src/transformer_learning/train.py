@@ -6,7 +6,7 @@ from rich import print
 from rich.console import Console
 from torch import nn
 
-from .transformer import subsequent_mask, device
+from .transformer import device, subsequent_mask
 
 console = Console()
 

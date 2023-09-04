@@ -10,9 +10,8 @@ from rich import print
 from rich.console import Console
 from torch.optim.lr_scheduler import LambdaLR
 
-from .train import SimpleLossCompute, data_gen, greedy_decode, run_epoch
-from .train import LabelSmoothing, loss, rate
-from .transformer import PositinalEncoding, make_model, subsequent_mask, device
+from .train import LabelSmoothing, SimpleLossCompute, data_gen, greedy_decode, loss, rate, run_epoch
+from .transformer import PositinalEncoding, device, make_model, subsequent_mask
 
 console = Console()
 

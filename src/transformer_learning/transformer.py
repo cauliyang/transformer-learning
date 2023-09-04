@@ -142,7 +142,7 @@ ensures that the predictions for position  can depend only on the known outputs 
 def subsequent_mask(size):
     attn_shape = (1, size, size)
     subsequent_mask = torch.triu(
-        torch.ones(attn_shape, device=device()), diagonal=1
+        torch.ones(attn_shape, device=device()), diagonal=1,
     ).type(torch.uint8)
     return subsequent_mask == 0
 
