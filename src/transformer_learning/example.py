@@ -10,7 +10,7 @@ from rich import print
 from rich.console import Console
 from torch.optim.lr_scheduler import LambdaLR
 
-from .train import LabelSmoothing, rate
+from .train import LabelSmoothing, loss, rate
 from .transformer import PositinalEncoding, make_model, subsequent_mask
 
 console = Console()
@@ -177,7 +177,7 @@ def example_learning_schedule():
     opts = [
         [512, 1, 4000],  # example 1
         [512, 1, 8000],  # example 2
-        [512, 1, 4000],  # example 3
+        [256, 1, 4000],  # example 3
     ]
 
     dummy_model = torch.nn.Linear(1, 1)
@@ -276,6 +276,29 @@ def example_label_smoothing():
     )
 
 
+@example
+@save_char
+def penalization_visulization():
+    crit = LabelSmoothing(5, 0, 0.1)
+    loss_data = pd.DataFrame(
+        {
+            "Loss": [loss(x, crit) for x in range(1, 100)],
+            "Step": list(range(99)),
+        },
+    ).astype(float)
+
+    return (
+        alt.Chart(loss_data)
+        .mark_line()
+        .properties(width=350)
+        .encode(
+            x="Step",
+            y="Loss",
+        )
+        .interactive()
+    )
+
+
 def main():
     console.print(f"Examples: {EXAMPLES}\n")
-    example_label_smoothing()
+    penalization_visulization()

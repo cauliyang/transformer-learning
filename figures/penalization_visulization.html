@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      #vis.vega-embed {
+        width: 100%;
+        display: flex;
+      }
+
+      #vis.vega-embed details,
+      #vis.vega-embed details summary {
+        position: relative;
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/vega@5"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/vega-lite@5.14.1"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/vega-embed@6"
+    ></script>
+  </head>
+  <body>
+    <div id="vis"></div>
+    <script>
+      (function (vegaEmbed) {
+        var spec = {
+          config: { view: { continuousWidth: 300, continuousHeight: 300 } },
+          data: { name: "data-0ddec718f46d8d3f85975ac02d5dbebf" },
+          mark: { type: "line" },
+          encoding: {
+            x: { field: "Step", type: "quantitative" },
+            y: { field: "Loss", type: "quantitative" },
+          },
+          params: [
+            {
+              name: "param_1",
+              select: { type: "interval", encodings: ["x", "y"] },
+              bind: "scales",
+            },
+          ],
+          width: 350,
+          $schema: "https://vega.github.io/schema/vega-lite/v5.14.1.json",
+          datasets: {
+            "data-0ddec718f46d8d3f85975ac02d5dbebf": [
+              { Loss: 0.9513500928878784, Step: 0.0 },
+              { Loss: 0.5506610870361328, Step: 1.0 },
+              { Loss: 0.36806416511535645, Step: 2.0 },
+              { Loss: 0.2633008360862732, Step: 3.0 },
+              { Loss: 0.19600316882133484, Step: 4.0 },
+              { Loss: 0.14969676733016968, Step: 5.0 },
+              { Loss: 0.11632173508405685, Step: 6.0 },
+              { Loss: 0.09145359694957733, Step: 7.0 },
+              { Loss: 0.07246029376983643, Step: 8.0 },
+              { Loss: 0.05767849087715149, Step: 9.0 },
+              { Loss: 0.046007364988327026, Step: 10.0 },
+              { Loss: 0.03668995201587677, Step: 11.0 },
+              { Loss: 0.029190056025981903, Step: 12.0 },
+              { Loss: 0.02311750501394272, Step: 13.0 },
+              { Loss: 0.01818234473466873, Step: 14.0 },
+              { Loss: 0.014164857566356659, Step: 15.0 },
+              { Loss: 0.010895997285842896, Step: 16.0 },
+              { Loss: 0.008243605494499207, Step: 17.0 },
+              { Loss: 0.006103135645389557, Step: 18.0 },
+              { Loss: 0.004390940070152283, Step: 19.0 },
+              { Loss: 0.0030393972992897034, Step: 20.0 },
+              { Loss: 0.0019933953881263733, Step: 21.0 },
+              { Loss: 0.0012075304985046387, Step: 22.0 },
+              { Loss: 0.0006441846489906311, Step: 23.0 },
+              { Loss: 0.00027205049991607666, Step: 24.0 },
+              { Loss: 6.46933913230896e-5, Step: 25.0 },
+              { Loss: 0.0, Step: 26.0 },
+              { Loss: 5.891919136047363e-5, Step: 27.0 },
+              { Loss: 0.00022541731595993042, Step: 28.0 },
+              { Loss: 0.0004856511950492859, Step: 29.0 },
+              { Loss: 0.0008278340101242065, Step: 30.0 },
+              { Loss: 0.0012415125966072083, Step: 31.0 },
+              { Loss: 0.0017178654670715332, Step: 32.0 },
+              { Loss: 0.002249211072921753, Step: 33.0 },
+              { Loss: 0.00282866507768631, Step: 34.0 },
+              { Loss: 0.003450356423854828, Step: 35.0 },
+              { Loss: 0.004109077155590057, Step: 36.0 },
+              { Loss: 0.004800267517566681, Step: 37.0 },
+              { Loss: 0.00551992654800415, Step: 38.0 },
+              { Loss: 0.006264358758926392, Step: 39.0 },
+              { Loss: 0.007030561566352844, Step: 40.0 },
+              { Loss: 0.00781557708978653, Step: 41.0 },
+              { Loss: 0.00861702486872673, Step: 42.0 },
+              { Loss: 0.009432688355445862, Step: 43.0 },
+              { Loss: 0.010260555893182755, Step: 44.0 },
+              { Loss: 0.011098768562078476, Step: 45.0 },
+              { Loss: 0.0119459368288517, Step: 46.0 },
+              { Loss: 0.012800503522157669, Step: 47.0 },
+              { Loss: 0.01366119459271431, Step: 48.0 },
+              { Loss: 0.014526978135108948, Step: 49.0 },
+              { Loss: 0.01539677381515503, Step: 50.0 },
+              { Loss: 0.016269605606794357, Step: 51.0 },
+              { Loss: 0.017144672572612762, Step: 52.0 },
+              { Loss: 0.018021363765001297, Step: 53.0 },
+              { Loss: 0.018898919224739075, Step: 54.0 },
+              { Loss: 0.019776728004217148, Step: 55.0 },
+              { Loss: 0.020654182881116867, Step: 56.0 },
+              { Loss: 0.021530888974666595, Step: 57.0 },
+              { Loss: 0.02240647003054619, Step: 58.0 },
+              { Loss: 0.02328038215637207, Step: 59.0 },
+              { Loss: 0.024152349680662155, Step: 60.0 },
+              { Loss: 0.025022096931934357, Step: 61.0 },
+              { Loss: 0.025889288634061813, Step: 62.0 },
+              { Loss: 0.02675364539027214, Step: 63.0 },
+              { Loss: 0.027614891529083252, Step: 64.0 },
+              { Loss: 0.02847297117114067, Step: 65.0 },
+              { Loss: 0.029327653348445892, Step: 66.0 },
+              { Loss: 0.030178681015968323, Step: 67.0 },
+              { Loss: 0.03102606162428856, Step: 68.0 },
+              { Loss: 0.031869515776634216, Step: 69.0 },
+              { Loss: 0.03270893916487694, Step: 70.0 },
+              { Loss: 0.0335443951189518, Step: 71.0 },
+              { Loss: 0.0343756340444088, Step: 72.0 },
+              { Loss: 0.03520262613892555, Step: 73.0 },
+              { Loss: 0.03602535277605057, Step: 74.0 },
+              { Loss: 0.036843590438365936, Step: 75.0 },
+              { Loss: 0.03765753284096718, Step: 76.0 },
+              { Loss: 0.038466960191726685, Step: 77.0 },
+              { Loss: 0.03927198797464371, Step: 78.0 },
+              { Loss: 0.040072351694107056, Step: 79.0 },
+              { Loss: 0.04086831212043762, Step: 80.0 },
+              { Loss: 0.04165969043970108, Step: 81.0 },
+              { Loss: 0.042446501553058624, Step: 82.0 },
+              { Loss: 0.043228790163993835, Step: 83.0 },
+              { Loss: 0.04400649666786194, Step: 84.0 },
+              { Loss: 0.04477955400943756, Step: 85.0 },
+              { Loss: 0.045548178255558014, Step: 86.0 },
+              { Loss: 0.046312116086483, Step: 87.0 },
+              { Loss: 0.047071583569049835, Step: 88.0 },
+              { Loss: 0.047826580703258514, Step: 89.0 },
+              { Loss: 0.04857698827981949, Step: 90.0 },
+              { Loss: 0.04932296276092529, Step: 91.0 },
+              { Loss: 0.05006442964076996, Step: 92.0 },
+              { Loss: 0.05080140382051468, Step: 93.0 },
+              { Loss: 0.0515340194106102, Step: 94.0 },
+              { Loss: 0.05226223170757294, Step: 95.0 },
+              { Loss: 0.05298604816198349, Step: 96.0 },
+              { Loss: 0.05370552837848663, Step: 97.0 },
+              { Loss: 0.05442076176404953, Step: 98.0 },
+            ],
+          },
+        };
+        var embedOpt = { mode: "vega-lite" };
+
+        function showError(el, error) {
+          el.innerHTML =
+            '<div style="color:red;">' +
+            "<p>JavaScript Error: " +
+            error.message +
+            "</p>" +
+            "<p>This usually means there's a typo in your chart specification. " +
+            "See the javascript console for the full traceback.</p>" +
+            "</div>";
+          throw error;
+        }
+        const el = document.getElementById("vis");
+        vegaEmbed("#vis", spec, embedOpt).catch((error) =>
+          showError(el, error),
+        );
+      })(vegaEmbed);
+    </script>
+  </body>
+</html>

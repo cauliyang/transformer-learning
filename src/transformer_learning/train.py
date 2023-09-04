@@ -106,26 +106,58 @@ def rate(step, model_size, factor, warmup):
 
 
 class LabelSmoothing(nn.Module):
-    def __init__(self, size, padding_idx, smotthing=0.0):
+    def __init__(self, size, padding_idx, smoothing=0.0):
         super().__init__()
-        self.criteria = nn.KLDivLoss(reduction="sum")
+        self.criterion = nn.KLDivLoss(reduction="sum")
         self.padding_idx = padding_idx
-        self.confidence = 1.0 - smotthing
-        self.smothing = smotthing
+        self.confidence = 1.0 - smoothing
+        self.smoothing = smoothing
         self.size = size
         self.true_dist = None
 
     def forward(self, x, target):
-        assert x.size(1) == self.size  # noqa: S101
-
+        assert x.size(1) == self.size
         true_dist = x.data.clone()
-        true_dist.fill_(self.smothing / (self.size - 2))
+        true_dist.fill_(self.smoothing / (self.size - 2))
         true_dist.scatter_(1, target.data.unsqueeze(1), self.confidence)
         true_dist[:, self.padding_idx] = 0
         mask = torch.nonzero(target.data == self.padding_idx)
-
         if mask.dim() > 0:
             true_dist.index_fill_(0, mask.squeeze(), 0.0)
-
         self.true_dist = true_dist
-        return self.criteria(x, true_dist.clone().detach())
+
+        return self.criterion(x, true_dist.clone().detach())
+
+
+def loss(x, crit):
+    d = x + 3 * 1
+    # FIX: in torch 2.0, nn.LDivLoss will return nan if tensor has value -inf <Yangyang Li>
+    predict = torch.FloatTensor([[1e-4, x / d, 1 / d, 1 / d, 1 / d]])
+    return crit(predict.log(), torch.LongTensor([1])).data
+
+
+def data_gen(V, batch_size, nbatches):
+    for _i in range(nbatches):
+        data = torch.randint(1, V, size=(batch_size, 10))
+        data[:, 0] = 1
+
+        src = data.requires_grad_(False).clone().detach()
+        tgt = data.requires_grad_(False).clone().detach()
+
+        yield Batch(src, tgt, 0)
+
+
+class SimpleLossCompute:
+    def __init__(self, generator, criterion):
+        self.generator = generator
+        self.criterion = criterion
+
+    def __call__(self, x, y, norm):
+        x = self.generator(x)
+
+        sloss = (
+            self.criterion(x.contiguous().view(-1, x.size(-1)), y.contiguous().view(-1))
+            / norm
+        )
+
+        return sloss.data * norm, sloss
