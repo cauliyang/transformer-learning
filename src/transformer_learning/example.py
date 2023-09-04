@@ -10,7 +10,15 @@ from rich import print
 from rich.console import Console
 from torch.optim.lr_scheduler import LambdaLR
 
-from .train import LabelSmoothing, SimpleLossCompute, data_gen, greedy_decode, loss, rate, run_epoch
+from .train import (
+    LabelSmoothing,
+    SimpleLossCompute,
+    data_gen,
+    greedy_decode,
+    loss,
+    rate,
+    run_epoch,
+)
 from .transformer import PositinalEncoding, device, make_model, subsequent_mask
 
 console = Console()
@@ -354,6 +362,10 @@ def example_simple_model():
     print(greedy_decode(model, src, src_mask, max_len, start_symbol=0))
 
 
+from .train import load_tokenizers, load_vocab
+
+
 def main():
     console.print(f"Examples: {EXAMPLES}\n")
-    example_simple_model()
+    spacy_de, spacy_en = load_tokenizers()
+    vocab_src, vocab_tgt = load_vocab(spacy_de, spacy_en)

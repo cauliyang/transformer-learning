@@ -18,6 +18,7 @@ flake8 = "*"
 black = "*"
 GPUtil = "*"
 wandb = "*"
+portalocker = "^2.7.0"
 
 
 [tool.poetry.scripts]
