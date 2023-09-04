@@ -10,8 +10,9 @@ from rich import print
 from rich.console import Console
 from torch.optim.lr_scheduler import LambdaLR
 
+from .train import SimpleLossCompute, data_gen, greedy_decode, run_epoch
 from .train import LabelSmoothing, loss, rate
-from .transformer import PositinalEncoding, make_model, subsequent_mask
+from .transformer import PositinalEncoding, make_model, subsequent_mask, device
 
 console = Console()
 
@@ -144,7 +145,7 @@ def inference_test():
 
     test_model.eval()
 
-    src = torch.LongTensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+    src = torch.LongTensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], device=device())
     src_mask = torch.ones(1, 1, 10)
 
     memory = test_model.encode(src, src_mask)
@@ -299,14 +300,15 @@ def penalization_visulization():
     )
 
 
-from .train import SimpleLossCompute, data_gen, greedy_decode, run_epoch
-
-
 @example
 def example_simple_model():
     V = 11
     criterion = LabelSmoothing(size=V, padding_idx=0, smoothing=0.0)
     model = make_model(V, V, N=2)
+
+    if torch.cuda.is_available():
+        console.print("Using CUDA", style="bold green")
+        model.cuda()
 
     optimizer = torch.optim.Adam(
         model.parameters(),
@@ -348,8 +350,9 @@ def example_simple_model():
 
     model.eval()
     src = torch.LongTensor([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
+    src = src.to(device())
     max_len = src.shape[1]
-    src_mask = torch.ones(1, 1, max_len)
+    src_mask = torch.ones(1, 1, max_len, device=device())
     print(greedy_decode(model, src, src_mask, max_len, start_symbol=0))
 
 

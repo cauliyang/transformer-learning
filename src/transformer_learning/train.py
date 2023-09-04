@@ -6,7 +6,7 @@ from rich import print
 from rich.console import Console
 from torch import nn
 
-from .transformer import subsequent_mask
+from .transformer import subsequent_mask, device
 
 console = Console()
 
@@ -138,7 +138,7 @@ def loss(x, crit):
 
 def data_gen(V, batch_size, nbatches):
     for _ in range(nbatches):
-        data = torch.randint(1, V, size=(batch_size, 10))
+        data = torch.randint(1, V, size=(batch_size, 10), device=device())
         data[:, 0] = 1
         src = data.requires_grad_(False).clone().detach()
         tgt = data.requires_grad_(False).clone().detach()
@@ -165,7 +165,7 @@ class SimpleLossCompute:
 def greedy_decode(model, src, src_mask, max_len, start_symbol):
     memory = model.encode(src, src_mask)
 
-    ys = torch.zeros(1, 1).fill_(start_symbol).type_as(src.data)
+    ys = torch.zeros(1, 1, device=device()).fill_(start_symbol).type_as(src.data)
     for _ in range(max_len - 1):
         out = model.decode(
             memory,

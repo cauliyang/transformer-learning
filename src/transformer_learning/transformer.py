@@ -8,6 +8,10 @@ from torch.nn.functional import log_softmax
 # WARN: 1. What is the layerNorm <08-23-23>
 
 
+def device():
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
 class EncoderDecoder(nn.Module):
     """
     A standard Encoder-Decoder architecture. Base for this and many
@@ -38,7 +42,7 @@ class Generator(nn.Module):
 
     def __init__(self, d_model, vocab):
         super().__init__()
-        self.proj = nn.Linear(d_model, vocab)
+        self.proj = nn.Linear(d_model, vocab, device=device())
 
     def forward(self, x):
         return log_softmax(self.proj(x), dim=-1)
@@ -51,8 +55,8 @@ def clones(module, N):
 class LayerNorm(nn.Module):
     def __init__(self, features, eps=1e-6) -> None:
         super().__init__()
-        self.a_2 = nn.Parameter(torch.ones(features))
-        self.b_2 = nn.Parameter(torch.zeros(features))
+        self.a_2 = nn.Parameter(torch.ones(features, device=device()))
+        self.b_2 = nn.Parameter(torch.zeros(features, device=device()))
         self.eps = eps
 
     def forward(self, x):
@@ -131,7 +135,9 @@ ensures that the predictions for position  can depend only on the known outputs 
 
 def subsequent_mask(size):
     attn_shape = (1, size, size)
-    subsequent_mask = torch.triu(torch.ones(attn_shape), diagonal=1).type(torch.uint8)
+    subsequent_mask = torch.triu(
+        torch.ones(attn_shape, device=device()), diagonal=1
+    ).type(torch.uint8)
     return subsequent_mask == 0
 
 
@@ -157,7 +163,7 @@ class MultiHeadedAttention(nn.Module):
 
         self.d_k = d_model // h
         self.h = h
-        self.linears = clones(nn.Linear(d_model, d_model), 4)
+        self.linears = clones(nn.Linear(d_model, d_model, device=device()), 4)
         self.attn = None
         self.dropout = nn.Dropout(dropout)
 
@@ -183,8 +189,8 @@ class MultiHeadedAttention(nn.Module):
 class PositionwiseFeedForward(nn.Module):
     def __init__(self, d_model, d_ff, dropout=0.1):
         super().__init__()
-        self.w_1 = nn.Linear(d_model, d_ff)
-        self.w_2 = nn.Linear(d_ff, d_model)
+        self.w_1 = nn.Linear(d_model, d_ff, device=device())
+        self.w_2 = nn.Linear(d_ff, d_model, device=device())
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
@@ -194,7 +200,7 @@ class PositionwiseFeedForward(nn.Module):
 class Embeddings(nn.Module):
     def __init__(self, d_model, vocab):
         super().__init__()
-        self.lut = nn.Embedding(vocab, d_model)
+        self.lut = nn.Embedding(vocab, d_model, device=device())
         self.d_model = d_model
 
     def forward(self, x):
@@ -206,10 +212,11 @@ class PositinalEncoding(nn.Module):
         super().__init__()
         self.dropout = nn.Dropout(dropout)
 
-        pe = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len).unsqueeze(1)
+        pe = torch.zeros(max_len, d_model, device=device())
+        position = torch.arange(0, max_len, device=device()).unsqueeze(1)
         div_term = torch.exp(
-            torch.arange(0, d_model, 2) * -(math.log(10000.0) / d_model),
+            torch.arange(0, d_model, 2, device=device())
+            * -(math.log(10000.0) / d_model),
         )
 
         pe[:, 0::2] = torch.sin(position * div_term)
