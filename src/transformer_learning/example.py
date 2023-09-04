@@ -306,9 +306,8 @@ def example_simple_model():
     criterion = LabelSmoothing(size=V, padding_idx=0, smoothing=0.0)
     model = make_model(V, V, N=2)
 
-    if torch.cuda.is_available():
-        console.print("Using CUDA", style="bold green")
-        model.cuda()
+    console.print(f"Using {device()}", style="bold green")
+    model.to(device())
 
     optimizer = torch.optim.Adam(
         model.parameters(),

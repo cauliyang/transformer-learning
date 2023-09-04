@@ -9,7 +9,13 @@ from torch.nn.functional import log_softmax
 
 
 def device():
-    return "cuda" if torch.cuda.is_available() else "cpu"
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+
+    return torch.device("cpu")
 
 
 class EncoderDecoder(nn.Module):
