@@ -169,7 +169,7 @@ class MultiHeadedAttention(nn.Module):
 
         query, key, value = (
             lin(x).view(nbatches, -1, self.h, self.d_k).transpose(1, 2)
-            for lin, x in zip(self.linears, (query, key, value), strict=True)
+            for lin, x in zip(self.linears, (query, key, value))  # noqa: B905
         )
 
         x, self.attn = attention(query, key, value, mask=mask, dropout=self.dropout)
