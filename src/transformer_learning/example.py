@@ -1,4 +1,5 @@
 import functools
+import ssl
 import subprocess
 import warnings
 from pathlib import Path
@@ -15,11 +16,16 @@ from .train import (
     SimpleLossCompute,
     data_gen,
     greedy_decode,
+    load_tokenizers,
+    load_vocab,
     loss,
     rate,
     run_epoch,
 )
 from .transformer import PositinalEncoding, device, make_model, subsequent_mask
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
 
 console = Console()
 
@@ -152,11 +158,11 @@ def inference_test():
 
     test_model.eval()
 
-    src = torch.LongTensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], device=device())
-    src_mask = torch.ones(1, 1, 10)
+    src = torch.LongTensor([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]).to(device())
+    src_mask = torch.ones(1, 1, 10, device=device())
 
     memory = test_model.encode(src, src_mask)
-    ys = torch.zeros(1, 1).type(torch.long)
+    ys = torch.zeros(1, 1, device=device()).type(torch.long)
 
     for _ in range(9):
         out = test_model.decode(memory, src_mask, ys, subsequent_mask(ys.size(1)))
@@ -322,6 +328,7 @@ def example_simple_model():
         betas=(0.9, 0.98),
         eps=1e-9,
     )
+
     lr_scheduler = LambdaLR(
         optimizer,
         lambda step: rate(
@@ -355,14 +362,10 @@ def example_simple_model():
         )[0]
 
     model.eval()
-    src = torch.LongTensor([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    src = src.to(device())
+    src = torch.LongTensor([[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]).to(device())
     max_len = src.shape[1]
     src_mask = torch.ones(1, 1, max_len, device=device())
     print(greedy_decode(model, src, src_mask, max_len, start_symbol=0))
-
-
-from .train import load_tokenizers, load_vocab
 
 
 def main():

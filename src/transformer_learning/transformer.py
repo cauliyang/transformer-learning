@@ -134,12 +134,15 @@ class DecoderLayer(nn.Module):
         return self.sublayer[2](x, self.feed_forward)
 
 
-"""WARN: This masking, combined with fact that the output embeddings are offset by one position,
-ensures that the predictions for position  can depend only on the known outputs at positions less than i. <08-23-23>
-"""
-
-
 def subsequent_mask(size):
+    """Create mask for decoder self-attention.
+
+    Args:
+        size (int): the length of the input sequence
+
+    Returns:
+        The mask for the decoder self-attention.
+    """
     attn_shape = (1, size, size)
     subsequent_mask = torch.triu(
         torch.ones(attn_shape, device=device()),
@@ -176,6 +179,7 @@ class MultiHeadedAttention(nn.Module):
 
     def forward(self, query, key, value, mask=None):
         if mask is not None:
+            # same mask applied to all h heads
             mask = mask.unsqueeze(1)
 
         nbatches = query.size(0)

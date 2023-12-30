@@ -15,7 +15,7 @@ console = Console()
 
 
 class Batch:
-    def __init__(self, src, tgt=None, pad=2):
+    def __init__(self, src, tgt=None, pad=2):  # pad=2: <blank>
         self.src = src
         self.src_mask = (src != pad).unsqueeze(-2)
 
@@ -33,10 +33,10 @@ class Batch:
 
 @dataclass
 class TrainState:
-    step: int = 0
-    accum_step: float = 0.0
-    samples: int = 0
-    tokens: int = 0
+    step: int = 0  # step in the current epoch
+    accum_step: int = 0  # number of accumulated steps
+    samples: int = 0  # total number of samples
+    tokens: int = 0  # total number of tokens
 
 
 def run_epoch(
@@ -145,7 +145,6 @@ def data_gen(V, batch_size, nbatches):
         data[:, 0] = 1
         src = data.requires_grad_(False).clone().detach()
         tgt = data.requires_grad_(False).clone().detach()
-
         yield Batch(src, tgt, 0)
 
 
@@ -156,18 +155,15 @@ class SimpleLossCompute:
 
     def __call__(self, x, y, norm):
         x = self.generator(x)
-
         sloss = (
             self.criterion(x.contiguous().view(-1, x.size(-1)), y.contiguous().view(-1))
             / norm
         )
-
         return sloss.data * norm, sloss
 
 
 def greedy_decode(model, src, src_mask, max_len, start_symbol):
     memory = model.encode(src, src_mask)
-
     ys = torch.zeros(1, 1, device=device()).fill_(start_symbol).type_as(src.data)
     for _ in range(max_len - 1):
         out = model.decode(
@@ -183,7 +179,6 @@ def greedy_decode(model, src, src_mask, max_len, start_symbol):
             [ys, torch.zeros(1, 1).type_as(src.data).fill_(next_word)],
             dim=1,
         )
-
     return ys
 
 
@@ -226,6 +221,7 @@ def build_vocabulary(spacy_de, spacy_en):
     print("Building German Vocabulary ...")
 
     train, val, test = datasets.Multi30k(language_pair=("de", "en"))
+
     vocab_src = build_vocab_from_iterator(
         yield_tokens(train + val + test, tokenize_de, index=0),
         min_freq=2,
